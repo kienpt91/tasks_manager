@@ -66,8 +66,9 @@ describe('Login Page', () => {
 
   it('displays error message on login failure', async () => {
     const user = userEvent.setup();
+    const errorObj = new Error('Invalid credentials');
     mockSignIn.mockResolvedValue({
-      error: { message: 'Invalid credentials' },
+      error: errorObj,
     });
 
     render(<Login />);

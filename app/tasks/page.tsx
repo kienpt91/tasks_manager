@@ -18,6 +18,7 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const fetchTasks = async () => {
@@ -31,8 +32,8 @@ export default function TasksPage() {
       if (!response.ok) throw new Error("Failed to fetch tasks");
       const data = await response.json();
       setTasks(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -53,8 +54,8 @@ export default function TasksPage() {
       const newTask = await response.json();
       setTasks([newTask, ...tasks]);
       setShowForm(false);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -68,8 +69,8 @@ export default function TasksPage() {
       if (!response.ok) throw new Error("Failed to update task");
       const updatedTask = await response.json();
       setTasks(tasks.map((t) => (t.id === id ? updatedTask : t)));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -81,8 +82,8 @@ export default function TasksPage() {
       });
       if (!response.ok) throw new Error("Failed to delete task");
       setTasks(tasks.filter((t) => t.id !== id));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 

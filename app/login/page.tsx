@@ -28,8 +28,8 @@ export default function Login() {
 
       router.push("/tasks");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export default function Login() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
           <p className="text-center text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-blue-600 hover:underline">
               Sign up
             </Link>

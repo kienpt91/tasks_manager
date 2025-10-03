@@ -66,8 +66,9 @@ describe('Signup Page', () => {
 
   it('displays error message on signup failure', async () => {
     const user = userEvent.setup();
+    const errorObj = new Error('User already exists');
     mockSignUp.mockResolvedValue({
-      error: { message: 'User already exists' },
+      error: errorObj,
     });
 
     render(<Signup />);
