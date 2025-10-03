@@ -30,7 +30,7 @@ describe('Tasks Page Integration', () => {
     });
   });
 
-  it('renders tasks page with navigation', () => {
+  it('renders tasks page with navigation', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => [],
@@ -38,11 +38,13 @@ describe('Tasks Page Integration', () => {
 
     render(<TasksPage />);
 
-    expect(screen.getByRole('heading', { name: /my tasks/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /my tasks/i })).toBeInTheDocument();
+    });
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });
 
-  it('displays filter buttons', () => {
+  it('displays filter buttons', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => [],
@@ -50,7 +52,9 @@ describe('Tasks Page Integration', () => {
 
     render(<TasksPage />);
 
-    expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument();
+    });
     expect(screen.getByRole('button', { name: /to do/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /in progress/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^done$/i })).toBeInTheDocument();
@@ -124,6 +128,10 @@ describe('Tasks Page Integration', () => {
 
     render(<TasksPage />);
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /new task/i })).toBeInTheDocument();
+    });
+
     await user.click(screen.getByRole('button', { name: /new task/i }));
 
     await waitFor(() => {
@@ -159,6 +167,10 @@ describe('Tasks Page Integration', () => {
 
     render(<TasksPage />);
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /to do/i })).toBeInTheDocument();
+    });
+
     await user.click(screen.getByRole('button', { name: /to do/i }));
 
     await waitFor(() => {
@@ -177,6 +189,10 @@ describe('Tasks Page Integration', () => {
     mockSignOut.mockResolvedValue({ error: null });
 
     render(<TasksPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
+    });
 
     await user.click(screen.getByRole('button', { name: /logout/i }));
 
