@@ -64,7 +64,24 @@ npm run dev
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-3. Sign up for a new account or log in
+3. Sign up for a new account
+
+### Demo Account
+
+For quick testing, use these credentials:
+- **Email**: `dev@example.com`
+- **Password**: `Demo@123456`
+
+This account has 12 sample tasks demonstrating the application features.
+
+### Seeding Sample Data
+
+To populate your own account with sample tasks:
+```bash
+npm run seed your-email@example.com your-password
+```
+
+This will create 12 sample tasks demonstrating the application features.
 
 ## Database Schema
 
