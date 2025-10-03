@@ -17,7 +17,20 @@ const customJestConfig = {
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/.next/**',
+    '!app/layout.tsx',
+    '!app/page.tsx',
+    '!app/api/**',
+    '!lib/supabase/middleware.ts',
+    '!lib/supabase/server.ts',
   ],
+  coverageThreshold: {
+    global: {
+      statements: 80,
+      branches: 65,
+      functions: 75,
+      lines: 80,
+    },
+  },
 }
 
 module.exports = createJestConfig(customJestConfig)
