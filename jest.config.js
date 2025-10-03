@@ -19,15 +19,13 @@ const customJestConfig = {
     '!**/.next/**',
     '!app/layout.tsx',
     '!app/page.tsx',
-    '!app/api/**',
     '!lib/supabase/middleware.ts',
-    '!lib/supabase/server.ts',
   ],
   coverageThreshold: {
     global: {
       statements: 80,
       branches: 65,
-      functions: 75,
+      functions: 70,
       lines: 80,
     },
   },

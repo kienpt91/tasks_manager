@@ -6,6 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 import { Task, TaskStatus } from "@/types/task";
 import TaskForm from "@/components/TaskForm";
 import TaskCard from "@/components/TaskCard";
+import Pagination from "@/components/Pagination";
+
+interface PaginationData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -13,25 +21,37 @@ export default function TasksPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TaskStatus | "all">("all");
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationData>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
     fetchTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [filter, currentPage]);
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const url =
-        filter === "all"
-          ? "/api/tasks"
-          : `/api/tasks?status=${filter}`;
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: "10",
+      });
+      if (filter !== "all") {
+        params.append("status", filter);
+      }
+      const url = `/api/tasks?${params.toString()}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch tasks");
-      const data = await response.json();
-      setTasks(data);
+      const responseData = await response.json();
+      setTasks(responseData.data);
+      setPagination(responseData.pagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -51,9 +71,9 @@ export default function TasksPage() {
         body: JSON.stringify(taskData),
       });
       if (!response.ok) throw new Error("Failed to create task");
-      const newTask = await response.json();
-      setTasks([newTask, ...tasks]);
       setShowForm(false);
+      // Refresh the task list after creation
+      fetchTasks();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -67,8 +87,8 @@ export default function TasksPage() {
         body: JSON.stringify(updates),
       });
       if (!response.ok) throw new Error("Failed to update task");
-      const updatedTask = await response.json();
-      setTasks(tasks.map((t) => (t.id === id ? updatedTask : t)));
+      // Refresh the task list after update
+      fetchTasks();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -81,10 +101,20 @@ export default function TasksPage() {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete task");
-      setTasks(tasks.filter((t) => t.id !== id));
+      // Refresh the task list after deletion
+      fetchTasks();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleFilterChange = (newFilter: TaskStatus | "all") => {
+    setFilter(newFilter);
+    setCurrentPage(1); // Reset to first page when filter changes
   };
 
   const handleLogout = async () => {
@@ -111,7 +141,7 @@ export default function TasksPage() {
         <div className="mb-6 flex justify-between items-center">
           <div className="flex gap-2">
             <button
-              onClick={() => setFilter("all")}
+              onClick={() => handleFilterChange("all")}
               className={`px-4 py-2 rounded-md ${
                 filter === "all"
                   ? "bg-blue-600 text-white"
@@ -121,7 +151,7 @@ export default function TasksPage() {
               All
             </button>
             <button
-              onClick={() => setFilter("todo")}
+              onClick={() => handleFilterChange("todo")}
               className={`px-4 py-2 rounded-md ${
                 filter === "todo"
                   ? "bg-blue-600 text-white"
@@ -131,7 +161,7 @@ export default function TasksPage() {
               To Do
             </button>
             <button
-              onClick={() => setFilter("in-progress")}
+              onClick={() => handleFilterChange("in-progress")}
               className={`px-4 py-2 rounded-md ${
                 filter === "in-progress"
                   ? "bg-blue-600 text-white"
@@ -141,7 +171,7 @@ export default function TasksPage() {
               In Progress
             </button>
             <button
-              onClick={() => setFilter("done")}
+              onClick={() => handleFilterChange("done")}
               className={`px-4 py-2 rounded-md ${
                 filter === "done"
                   ? "bg-blue-600 text-white"

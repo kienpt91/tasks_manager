@@ -13,12 +13,33 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = parseInt(searchParams.get("limit") || "10");
+  const offset = (page - 1) * limit;
 
+  // Get total count for pagination metadata
+  let countQuery = supabase
+    .from("tasks")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if (status) {
+    countQuery = countQuery.eq("status", status);
+  }
+
+  const { count, error: countError } = await countQuery;
+
+  if (countError) {
+    return NextResponse.json({ error: countError.message }, { status: 500 });
+  }
+
+  // Get paginated data
   let query = supabase
     .from("tasks")
     .select("*")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (status) {
     query = query.eq("status", status);
@@ -30,7 +51,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json({
+    data,
+    pagination: {
+      page,
+      limit,
+      total: count || 0,
+      totalPages: Math.ceil((count || 0) / limit),
+    },
+  });
 }
 
 export async function POST(request: NextRequest) {
