@@ -19,21 +19,21 @@ export default function Pagination({
   const endItem = Math.min(currentPage * limit, total);
 
   return (
-    <div className="flex items-center justify-between mt-6 pt-4 border-t">
-      <div className="text-sm text-gray-600">
+    <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-4 border-t gap-4">
+      <div className="text-sm text-gray-600 order-2 sm:order-1">
         Showing {startItem} to {endItem} of {total} tasks
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2 order-1 sm:order-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+          className="px-3 sm:px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors text-sm"
         >
           Previous
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
             // Show first page, last page, current page, and pages around current
             const showPage =
@@ -45,7 +45,7 @@ export default function Pagination({
               // Show ellipsis
               if (page === currentPage - 2 || page === currentPage + 2) {
                 return (
-                  <span key={page} className="px-2">
+                  <span key={page} className="px-1 sm:px-2 text-sm">
                     ...
                   </span>
                 );
@@ -57,7 +57,7 @@ export default function Pagination({
               <button
                 key={page}
                 onClick={() => onPageChange(page)}
-                className={`px-4 py-2 rounded-lg border transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg border transition-colors text-sm ${
                   page === currentPage
                     ? "bg-blue-500 text-white border-blue-500"
                     : "hover:bg-gray-50"
@@ -72,7 +72,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+          className="px-3 sm:px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors text-sm"
         >
           Next
         </button>

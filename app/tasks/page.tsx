@@ -137,12 +137,12 @@ export default function TasksPage() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex gap-2">
+      <main className="max-w-7xl mx-auto px-6 sm:px-8 py-8">
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => handleFilterChange("all")}
-              className={`px-4 py-2 rounded-md ${
+              className={`px-3 sm:px-4 py-2 rounded-md text-sm ${
                 filter === "all"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -152,7 +152,7 @@ export default function TasksPage() {
             </button>
             <button
               onClick={() => handleFilterChange("todo")}
-              className={`px-4 py-2 rounded-md ${
+              className={`px-3 sm:px-4 py-2 rounded-md text-sm ${
                 filter === "todo"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -162,7 +162,7 @@ export default function TasksPage() {
             </button>
             <button
               onClick={() => handleFilterChange("in-progress")}
-              className={`px-4 py-2 rounded-md ${
+              className={`px-3 sm:px-4 py-2 rounded-md text-sm ${
                 filter === "in-progress"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -172,7 +172,7 @@ export default function TasksPage() {
             </button>
             <button
               onClick={() => handleFilterChange("done")}
-              className={`px-4 py-2 rounded-md ${
+              className={`px-3 sm:px-4 py-2 rounded-md text-sm ${
                 filter === "done"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -183,7 +183,7 @@ export default function TasksPage() {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm whitespace-nowrap"
           >
             {showForm ? "Cancel" : "New Task"}
           </button>
@@ -211,16 +211,28 @@ export default function TasksPage() {
             No tasks found. Create one to get started!
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {tasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onUpdate={updateTask}
-                onDelete={deleteTask}
+          <>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {tasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onUpdate={updateTask}
+                  onDelete={deleteTask}
+                />
+              ))}
+            </div>
+
+            {pagination.totalPages > 1 && (
+              <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+                total={pagination.total}
+                limit={pagination.limit}
               />
-            ))}
-          </div>
+            )}
+          </>
         )}
       </main>
     </div>

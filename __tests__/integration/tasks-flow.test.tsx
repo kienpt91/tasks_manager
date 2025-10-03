@@ -33,7 +33,10 @@ describe('Tasks Page Integration', () => {
   it('renders tasks page with navigation', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => [],
+      json: async () => ({
+        data: [],
+        pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+      }),
     });
 
     render(<TasksPage />);
@@ -47,7 +50,10 @@ describe('Tasks Page Integration', () => {
   it('displays filter buttons', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => [],
+      json: async () => ({
+        data: [],
+        pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+      }),
     });
 
     render(<TasksPage />);
@@ -82,7 +88,7 @@ describe('Tasks Page Integration', () => {
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => mockTasks,
+      json: async () => ({ data: mockTasks, pagination: { page: 1, limit: 10, total: mockTasks.length, totalPages: 1 } }),
     });
 
     render(<TasksPage />);
@@ -96,7 +102,7 @@ describe('Tasks Page Integration', () => {
   it('shows empty state when no tasks', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => [],
+      json: async () => ({ data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }),
     });
 
     render(<TasksPage />);
@@ -112,7 +118,7 @@ describe('Tasks Page Integration', () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => [],
+        json: async () => ({ data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }),
       })
       .mockResolvedValueOnce({
         ok: true,
@@ -124,6 +130,10 @@ describe('Tasks Page Integration', () => {
           user_id: 'user-1',
           created_at: '2025-01-03',
         }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }),
       });
 
     render(<TasksPage />);
@@ -162,7 +172,7 @@ describe('Tasks Page Integration', () => {
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => [],
+      json: async () => ({ data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }),
     });
 
     render(<TasksPage />);
@@ -174,7 +184,7 @@ describe('Tasks Page Integration', () => {
     await user.click(screen.getByRole('button', { name: /to do/i }));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/tasks?status=todo');
+      expect(global.fetch).toHaveBeenCalledWith('/api/tasks?page=1&limit=10&status=todo');
     });
   });
 
@@ -183,7 +193,7 @@ describe('Tasks Page Integration', () => {
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => [],
+      json: async () => ({ data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }),
     });
 
     mockSignOut.mockResolvedValue({ error: null });

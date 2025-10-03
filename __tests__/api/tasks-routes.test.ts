@@ -46,21 +46,35 @@ describe('Tasks API Routes', () => {
         error: null,
       });
 
-      const mockQuery = {
-        eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({ data: mockTasks, error: null }),
+      // Mock count query
+      const mockCountQuery = {
+        eq: jest.fn().mockResolvedValue({ count: 1, error: null }),
       };
 
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockQuery),
-      });
+      // Mock data query
+      const mockQuery = {
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({ data: mockTasks, error: null }),
+      };
+
+      const mockSelect = jest.fn();
+      mockSupabase.from.mockImplementation(() => ({
+        select: mockSelect.mockImplementation((query: string, options?: any) => {
+          if (options?.count === 'exact') {
+            return mockCountQuery;
+          }
+          return mockQuery;
+        }),
+      }));
 
       const request = new Request('http://localhost:3000/api/tasks');
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data).toEqual(mockTasks);
+      expect(data.data).toEqual(mockTasks);
+      expect(data.pagination).toBeDefined();
     });
 
     it('should filter tasks by status query parameter', async () => {
@@ -74,23 +88,45 @@ describe('Tasks API Routes', () => {
         error: null,
       });
 
-      const mockQuery = {
+      // Mock count query with chainable eq that returns itself
+      const mockCountQuery = {
         eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({ data: mockTasks, error: null }),
       };
-
-      const mockSelect = {
-        eq: jest.fn().mockReturnValue(mockQuery),
-      };
-
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockSelect),
+      // Make it awaitable
+      Object.assign(mockCountQuery, {
+        then: (resolve: any) => resolve({ count: 1, error: null }),
+        catch: (reject: any) => reject,
       });
+
+      // Mock data query with chainable methods
+      const mockDataQuery = {
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockReturnThis(), // range should return this to allow chaining
+      };
+      // Make the final query awaitable
+      Object.assign(mockDataQuery, {
+        then: (resolve: any) => resolve({ data: mockTasks, error: null }),
+        catch: (reject: any) => reject,
+      });
+
+      let callCount = 0;
+      const mockSelect = jest.fn();
+      mockSupabase.from.mockImplementation(() => ({
+        select: mockSelect.mockImplementation((query: string, options?: any) => {
+          if (options?.count === 'exact') {
+            return mockCountQuery;
+          }
+          // Each time .select() is called for data, return a fresh query object
+          return mockDataQuery;
+        }),
+      }));
 
       const request = new Request('http://localhost:3000/api/tasks?status=todo');
       const response = await GET(request);
 
-      expect(mockSelect.eq).toHaveBeenCalledWith('status', 'todo');
+      expect(mockCountQuery.eq).toHaveBeenCalledWith('status', 'todo');
+      expect(mockDataQuery.eq).toHaveBeenCalledWith('status', 'todo');
       expect(response.status).toBe(200);
     });
 
@@ -102,17 +138,23 @@ describe('Tasks API Routes', () => {
         error: null,
       });
 
-      const mockQuery = {
-        eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({
-          data: null,
+      // Mock count query returning error
+      const mockCountQuery = {
+        eq: jest.fn().mockResolvedValue({
+          count: null,
           error: { message: 'Database error' },
         }),
       };
 
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockQuery),
-      });
+      const mockSelect = jest.fn();
+      mockSupabase.from.mockImplementation(() => ({
+        select: mockSelect.mockImplementation((query: string, options?: any) => {
+          if (options?.count === 'exact') {
+            return mockCountQuery;
+          }
+          return null;
+        }),
+      }));
 
       const request = new Request('http://localhost:3000/api/tasks');
       const response = await GET(request);
