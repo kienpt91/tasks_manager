@@ -1,5 +1,8 @@
 # Task Manager App
 
+![Test Suite](https://github.com/kienpt91/tasks_manager/actions/workflows/test.yml/badge.svg)
+![Build](https://github.com/kienpt91/tasks_manager/actions/workflows/build.yml/badge.svg)
+
 A full-stack task management application built with Next.js, TypeScript, and Supabase.
 
 ## Features
