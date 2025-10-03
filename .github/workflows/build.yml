@@ -1,11 +1,11 @@
-name: Build & Deploy
+name: Build Check
 
 on:
   push:
     branches: [ master, main ]
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,18 +21,17 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Build application
-      run: npm run build
-      env:
-        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}
+    - name: Type Check
+      run: npx tsc --noEmit
 
     - name: Build Summary
       run: |
-        echo "## Build Results" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Build completed successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "## Build Check Results" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Type checking passed!" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Next.js Build Info" >> $GITHUB_STEP_SUMMARY
+        echo "### Project Info" >> $GITHUB_STEP_SUMMARY
         echo "- Framework: Next.js 15" >> $GITHUB_STEP_SUMMARY
         echo "- TypeScript: ✓" >> $GITHUB_STEP_SUMMARY
         echo "- Tailwind CSS: ✓" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Note**: Full build requires Supabase credentials. Configure secrets for production builds." >> $GITHUB_STEP_SUMMARY
