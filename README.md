@@ -5,6 +5,10 @@
 
 A full-stack task management application built with Next.js, TypeScript, and Supabase.
 
+## 🚀 Live Demo
+
+**Production URL**: https://tasks-manager-rust.vercel.app/
+
 ## Features
 
 - User authentication (sign up, login, logout)
@@ -140,19 +144,42 @@ task_manager/
 
 ## Deployment
 
-### Vercel
+### Vercel (Production)
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+The application is deployed at: **https://tasks-manager-rust.vercel.app/**
+
+To deploy your own instance:
+
+1. **Import Repository**:
+   - Go to https://vercel.com
+   - Click "New Project"
+   - Import your GitHub repository
+
+2. **Configure Environment Variables**:
+   - Go to Project Settings → Environment Variables
+   - Add these variables for all environments (Production, Preview, Development):
+     - `NEXT_PUBLIC_SUPABASE_URL` = Your Supabase project URL
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = Your Supabase anon key
+
+3. **Deploy**:
+   - Vercel will automatically build and deploy
+   - Get your deployment URL (e.g., `https://your-app.vercel.app`)
+
+4. **Update Supabase Configuration**:
+   - Go to Supabase Dashboard → Authentication → URL Configuration
+   - Update "Site URL" to your Vercel URL
+   - Add Redirect URLs:
+     ```
+     https://your-app.vercel.app/**
+     http://localhost:3000/**
+     ```
 
 ### Supabase
 
-Your Supabase project is already hosted. Just ensure:
+Your Supabase project is already hosted. Ensure:
 - The migration script has been run
 - RLS policies are enabled
-- API keys are correctly configured
+- Redirect URLs include your Vercel deployment URL
 
 ## License
 
