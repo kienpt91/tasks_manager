@@ -38,7 +38,7 @@ describe('Tasks API Routes', () => {
     it('should return tasks for authenticated user', async () => {
       const mockUser = { id: 'user-123' };
       const mockTasks = [
-        { id: '1', title: 'Task 1', status: 'todo', user_id: 'user-123' },
+        { id: '1', title: 'Task 1', status: 'todo', user_id: 'user-123', created_at: new Date().toISOString() },
       ];
 
       mockSupabase.auth.getUser.mockResolvedValue({
@@ -51,11 +51,9 @@ describe('Tasks API Routes', () => {
         eq: jest.fn().mockResolvedValue({ count: 1, error: null }),
       };
 
-      // Mock data query
+      // Mock data query - new implementation fetches all data without order/range
       const mockQuery = {
-        eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockReturnThis(),
-        range: jest.fn().mockResolvedValue({ data: mockTasks, error: null }),
+        eq: jest.fn().mockResolvedValue({ data: mockTasks, error: null }),
       };
 
       const mockSelect = jest.fn();
@@ -80,7 +78,7 @@ describe('Tasks API Routes', () => {
     it('should filter tasks by status query parameter', async () => {
       const mockUser = { id: 'user-123' };
       const mockTasks = [
-        { id: '1', title: 'Task 1', status: 'todo', user_id: 'user-123' },
+        { id: '1', title: 'Task 1', status: 'todo', user_id: 'user-123', created_at: new Date().toISOString() },
       ];
 
       mockSupabase.auth.getUser.mockResolvedValue({
@@ -98,11 +96,9 @@ describe('Tasks API Routes', () => {
         catch: (reject: any) => reject,
       });
 
-      // Mock data query with chainable methods
+      // Mock data query - new implementation just uses eq
       const mockDataQuery = {
         eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockReturnThis(),
-        range: jest.fn().mockReturnThis(), // range should return this to allow chaining
       };
       // Make the final query awaitable
       Object.assign(mockDataQuery, {
@@ -110,7 +106,6 @@ describe('Tasks API Routes', () => {
         catch: (reject: any) => reject,
       });
 
-      let callCount = 0;
       const mockSelect = jest.fn();
       mockSupabase.from.mockImplementation(() => ({
         select: mockSelect.mockImplementation((query: string, options?: any) => {
