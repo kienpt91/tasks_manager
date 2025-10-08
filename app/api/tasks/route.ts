@@ -33,26 +33,36 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: countError.message }, { status: 500 });
   }
 
-  // Get paginated data
+  // Get all data for sorting (we'll paginate after sorting)
   let query = supabase
     .from("tasks")
     .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+    .eq("user_id", user.id);
 
   if (status) {
     query = query.eq("status", status);
   }
 
-  const { data, error } = await query;
+  const { data: allData, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Sort by status priority (todo -> in-progress -> done), then by created_at
+  const statusOrder = { todo: 1, "in-progress": 2, done: 3 };
+  const sortedData = (allData || []).sort((a, b) => {
+    const statusDiff = statusOrder[a.status as keyof typeof statusOrder] - statusOrder[b.status as keyof typeof statusOrder];
+    if (statusDiff !== 0) return statusDiff;
+    // If same status, sort by created_at descending (newest first)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  // Apply pagination after sorting
+  const paginatedData = sortedData.slice(offset, offset + limit);
+
   return NextResponse.json({
-    data,
+    data: paginatedData,
     pagination: {
       page,
       limit,
